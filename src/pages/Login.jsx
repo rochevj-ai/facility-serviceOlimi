@@ -6,6 +6,13 @@ const ROLE_LABELS = {
   manager: 'Керівник',
 }
 
+const COMPANY_LABELS = {
+  tier: 'TIER',
+  olimi: 'OLIMI',
+  like: 'LIKE',
+  razom: 'RAZOM',
+}
+
 export default function Login() {
   const { users, login } = useAuth()
 
@@ -23,7 +30,7 @@ export default function Login() {
             <div>
               <div style={{ fontWeight: 700 }}>{u.name}</div>
               <div style={{ fontSize: '.8rem', color: '#64748b', fontWeight: 400 }}>
-                {ROLE_LABELS[u.role]}
+                {ROLE_LABELS[u.role]}{u.company ? ` · ${COMPANY_LABELS[u.company]}` : ''}
               </div>
             </div>
           </button>

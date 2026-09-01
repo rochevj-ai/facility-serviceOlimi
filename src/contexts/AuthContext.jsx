@@ -4,9 +4,13 @@ const AuthContext = createContext(null)
 
 const USERS = [
   { id: 'sergiy', name: 'Сергій', role: 'facility' },
-  { id: 'evgenii', name: 'Євгеній', role: 'admin' },
-  { id: 'anna', name: 'Анна', role: 'manager', company: 'like' },
-  { id: 'manager', name: 'Керівник', role: 'manager' },
+  { id: 'evgenii', name: 'Євгеній Рочев', role: 'admin' },
+  { id: 'liubov', name: 'Любов Деблюк', role: 'manager', company: 'tier' },
+  { id: 'alina', name: 'Аліна Мокляк', role: 'manager', company: 'like' },
+  { id: 'artem', name: 'Тимша Артем', role: 'manager', company: 'razom' },
+  { id: 'maksym', name: 'Худолій Максим', role: 'manager', company: 'olimi' },
+  { id: 'anastasiia', name: 'Анастасія', role: 'manager', company: 'like' },
+  { id: 'anna', name: 'Анна', role: 'manager', company: 'razom' },
 ]
 
 export function AuthProvider({ children }) {
