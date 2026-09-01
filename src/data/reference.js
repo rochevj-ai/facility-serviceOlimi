@@ -43,8 +43,8 @@ export const PRIORITIES = [
 export const DEADLINES = [
   { id: 'today', label: 'Сьогодні' },
   { id: 'tomorrow', label: 'Завтра' },
-  { id: 'this_week', label: 'Цього тижня' },
-  { id: 'custom', label: 'Вибрати дату' },
+  { id: 'this_week', label: 'На цьому тижні' },
+  { id: 'two_weeks', label: 'Впродовж 2 тижнів' },
 ]
 
 export const STATUSES = [
