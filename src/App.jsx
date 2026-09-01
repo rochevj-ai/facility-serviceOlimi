@@ -8,6 +8,7 @@ import MyWork from './pages/MyWork'
 import CompleteRequest from './pages/CompleteRequest'
 import DailyReport from './pages/DailyReport'
 import Dashboard from './pages/Dashboard'
+import Trips from './pages/Trips'
 import Login from './pages/Login'
 
 function Header() {
@@ -24,12 +25,7 @@ function Header() {
       <h1 onClick={() => navigate('/')} style={{ cursor: 'pointer' }}>🔧 Facility Service</h1>
       <div className="header-right">
         <span className="header-user">{user?.name}</span>
-        <button
-          className="header-back"
-          onClick={logout}
-          title="Вийти"
-          style={{ fontSize: '1.1rem' }}
-        >⏻</button>
+        <button className="header-back" onClick={logout} title="Вийти" style={{ fontSize: '1.1rem' }}>⏻</button>
       </div>
     </header>
   )
@@ -37,7 +33,6 @@ function Header() {
 
 export default function App() {
   const { user } = useAuth()
-
   if (!user) return <Login />
 
   return (
@@ -52,6 +47,7 @@ export default function App() {
         <Route path="/complete/:id" element={<CompleteRequest />} />
         <Route path="/daily-report" element={<DailyReport />} />
         <Route path="/dashboard" element={<Dashboard />} />
+        <Route path="/trips" element={<Trips />} />
       </Routes>
     </>
   )
