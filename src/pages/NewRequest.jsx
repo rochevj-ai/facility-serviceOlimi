@@ -10,34 +10,44 @@ export default function NewRequest() {
   const navigate = useNavigate()
   const [saving, setSaving] = useState(false)
   const [toast, setToast] = useState('')
+  const [error, setError] = useState('')
 
-  const [form, setForm] = useState({
-    company: '',
-    object: '',
-    category: '',
-    description: '',
-    priority: 'normal',
-    deadline: 'this_week',
-    deadlineDate: '',
-    contact: user?.name || '',
-    contactPhone: '',
-  })
+  const [company, setCompany] = useState('')
+  const [object, setObject] = useState('')
+  const [category, setCategory] = useState('')
+  const [description, setDescription] = useState('')
+  const [priority, setPriority] = useState('normal')
+  const [deadline, setDeadline] = useState('this_week')
+  const [deadlineDate, setDeadlineDate] = useState('')
+  const [contact, setContact] = useState(user?.name || '')
+  const [contactPhone, setContactPhone] = useState('')
 
-  const set = (k, v) => setForm(f => ({ ...f, [k]: v }))
-  const objects = OBJECTS_BY_COMPANY[form.company] || []
-  const canSubmit = form.company && form.object && form.category && form.description.trim()
+  const objects = OBJECTS_BY_COMPANY[company] || []
 
   const handleSubmit = async () => {
-    if (!canSubmit || saving) return
+    if (saving) return
+
+    if (!company) { setError('Оберіть напрямок'); return }
+    if (!object) { setError('Оберіть об\'єкт'); return }
+    if (!category) { setError('Оберіть категорію'); return }
+    if (!description.trim()) { setError('Опишіть що потрібно зробити'); return }
+
+    setError('')
     setSaving(true)
     try {
-      const req = await createRequest({ ...form, createdBy: user.name })
+      const form = {
+        company, object, category, description,
+        priority, deadline, deadlineDate,
+        contact, contactPhone,
+        createdBy: user.name,
+      }
+      const req = await createRequest(form)
       await sendTelegramNotify('new_request', req)
       setToast(`Заявку ${req.number} створено`)
       setTimeout(() => navigate('/requests'), 1200)
     } catch (e) {
       console.error(e)
-      setToast('Помилка при створенні')
+      setError('Помилка: ' + e.message)
       setSaving(false)
     }
   }
@@ -53,22 +63,24 @@ export default function NewRequest() {
           {COMPANIES.map(c => (
             <button
               key={c.id}
-              className={`chip ${form.company === c.id ? 'selected' : ''}`}
-              onClick={() => { set('company', c.id); set('object', '') }}
+              type="button"
+              className={`chip ${company === c.id ? 'selected' : ''}`}
+              onClick={() => { setCompany(c.id); setObject('') }}
             >{c.label}</button>
           ))}
         </div>
       </div>
 
-      {form.company && (
+      {company && (
         <div className="form-group">
           <label className="form-label">Об'єкт</label>
           <div className="chip-grid">
             {objects.map(o => (
               <button
                 key={o}
-                className={`chip ${form.object === o ? 'selected' : ''}`}
-                onClick={() => set('object', o)}
+                type="button"
+                className={`chip ${object === o ? 'selected' : ''}`}
+                onClick={() => setObject(o)}
               >{o}</button>
             ))}
           </div>
@@ -81,8 +93,9 @@ export default function NewRequest() {
           {CATEGORIES.map(c => (
             <button
               key={c.id}
-              className={`chip ${form.category === c.id ? 'selected' : ''}`}
-              onClick={() => set('category', c.id)}
+              type="button"
+              className={`chip ${category === c.id ? 'selected' : ''}`}
+              onClick={() => setCategory(c.id)}
             >{c.icon} {c.label}</button>
           ))}
         </div>
@@ -94,8 +107,8 @@ export default function NewRequest() {
           className="form-textarea"
           rows={3}
           placeholder="Опишіть проблему або роботу…"
-          value={form.description}
-          onChange={e => set('description', e.target.value)}
+          value={description}
+          onChange={e => setDescription(e.target.value)}
         />
       </div>
 
@@ -104,9 +117,9 @@ export default function NewRequest() {
         {PRIORITIES.map(p => (
           <div
             key={p.id}
-            className={`priority-option ${form.priority === p.id ? 'selected' : ''}`}
-            style={form.priority === p.id ? { borderColor: p.color, color: p.color } : {}}
-            onClick={() => set('priority', p.id)}
+            className={`priority-option ${priority === p.id ? 'selected' : ''}`}
+            style={priority === p.id ? { borderColor: p.color, color: p.color } : {}}
+            onClick={() => setPriority(p.id)}
           >
             <span className="icon">{p.icon}</span>
             <div>
@@ -123,17 +136,18 @@ export default function NewRequest() {
           {DEADLINES.map(d => (
             <button
               key={d.id}
-              className={`chip ${form.deadline === d.id ? 'selected' : ''}`}
-              onClick={() => set('deadline', d.id)}
+              type="button"
+              className={`chip ${deadline === d.id ? 'selected' : ''}`}
+              onClick={() => setDeadline(d.id)}
             >{d.label}</button>
           ))}
         </div>
-        {form.deadline === 'custom' && (
+        {deadline === 'custom' && (
           <input
             type="date"
             className="form-input mt-8"
-            value={form.deadlineDate}
-            onChange={e => set('deadlineDate', e.target.value)}
+            value={deadlineDate}
+            onChange={e => setDeadlineDate(e.target.value)}
           />
         )}
       </div>
@@ -143,21 +157,28 @@ export default function NewRequest() {
         <input
           className="form-input"
           placeholder="Ім'я"
-          value={form.contact}
-          onChange={e => set('contact', e.target.value)}
+          value={contact}
+          onChange={e => setContact(e.target.value)}
         />
         <input
           className="form-input mt-8"
           placeholder="Телефон (необов'язково)"
           type="tel"
-          value={form.contactPhone}
-          onChange={e => set('contactPhone', e.target.value)}
+          value={contactPhone}
+          onChange={e => setContactPhone(e.target.value)}
         />
       </div>
 
+      {error && (
+        <div style={{ color: '#ef4444', fontWeight: 600, marginBottom: 12, textAlign: 'center' }}>
+          {error}
+        </div>
+      )}
+
       <button
-        className={`btn ${canSubmit ? 'btn-primary' : 'btn-ghost'} btn-block btn-lg`}
-        disabled={!canSubmit || saving}
+        type="button"
+        className="btn btn-primary btn-block btn-lg"
+        disabled={saving}
         onClick={handleSubmit}
       >
         {saving ? 'Зберігаю…' : '✅ Створити заявку'}
